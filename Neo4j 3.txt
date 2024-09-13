@@ -1,0 +1,29 @@
+# Ensure session is correctly initialized
+driver = GraphDatabase.driver(neo4j_uri, auth=neo4j_AUTH)
+session = driver.session()
+
+result = session.run(
+    """
+    MATCH (review:Review)-[:REVIEWS]->(movie:Movie),
+          (review)-[:WRITTEN_BY]->(author:Author)
+    RETURN review.content AS ReviewContent,
+           review.rating AS Rating,
+           review.comment_date AS CommentDate,
+           author.name AS AuthorName,
+           movie.imdb_id AS IMDB_ID,
+           movie.tmdb_id AS TMDB_ID
+    LIMIT 5
+    """
+)
+
+for record in result:
+    print(f"Review Content: {record['ReviewContent']}")
+    print(f"Rating: {record['Rating']}")
+    print(f"Comment Date: {record['CommentDate']}")
+    print(f"Author: {record['AuthorName']}")
+    print(f"Movie IMDB ID: {record['IMDB_ID']}")
+    print(f"Movie TMDB ID: {record['TMDB_ID']}")
+    print()
+
+session.close()
+driver.close()

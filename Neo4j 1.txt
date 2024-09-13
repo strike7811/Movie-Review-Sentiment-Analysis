@@ -1,0 +1,35 @@
+neo4j_uri = "neo4j+s://c727514f.databases.neo4j.io"  # Update with your Neo4j server URI
+neo4j_username = "neo4j"  # Update with your Neo4j username
+neo4j_password = "N3lhxmiZFMkcJqTZ6XTJ7bpWyEH5cWyoFPQaejYqHFE"  # Update with your Neo4j password
+neo4j_AUTH = (neo4j_username, neo4j_password)"
+
+driver = GraphDatabase.driver(neo4j_uri, auth=neo4j_AUTH)
+session = driver.session()
+
+for record in dataframe.itertuples(index=False):
+    # Create Review node
+    session.run(
+        """
+        MERGE (review:Review {id: $review_ID, content: $content, rating: $rating, comment_date: $comment_date, content_length: $content_length, sentiment: $sentiment})
+        """,
+        record.asDict()
+    )
+
+    session.run(
+        """
+        MERGE (movie:Movie {imdb_id: $imdb_id, tmdb_id: $tmdb_id})
+        """,
+        record.asDict()
+    )
+
+    session.run(
+        """
+        MERGE (author:Author {name: $author})
+        """,
+        record.asDict()
+    )
+
+driver.close()
+
+# Close the driver session
+# session.close()

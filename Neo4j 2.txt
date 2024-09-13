@@ -1,0 +1,22 @@
+# Create a Neo4j session
+driver = GraphDatabase.driver(neo4j_uri, auth=neo4j_AUTH)
+session = driver.session()
+
+# Create relationships
+session.run(
+        """
+        MATCH (review:Review {id: $review_ID}), (movie:Movie {imdb_id: $imdb_id})
+        MERGE (review)-[:REVIEWS]->(movie)
+        """,
+        review_ID=record.review_ID,
+        imdb_id=record.imdb_id,
+    )
+
+session.run(
+        """
+        MATCH (review:Review {id: $review_ID}), (author:Author {name: $author})
+        MERGE (review)-[:WRITTEN_BY]->(author)
+        """,
+        review_ID=record.review_ID,
+        author=record.author,
+    )
